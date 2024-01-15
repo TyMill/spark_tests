@@ -40,6 +40,20 @@ thresholds = sorted(predictions_pd['score'].unique(), reverse=True)
 tpr = []
 fpr = []
 
+# Confusion Matrix Calculation
+tp = predictions[(predictions.label == 1) & (predictions.prediction == 1)].count()
+tn = predictions[(predictions.label == 0) & (predictions.prediction == 0)].count()
+fp = predictions[(predictions.label == 0) & (predictions.prediction == 1)].count()
+fn = predictions[(predictions.label == 1) & (predictions.prediction == 0)].count()
+
+# Display the confusion matrix
+print("Confusion Matrix:")
+print(f"True Positives (TP): {tp}")
+print(f"False Positives (FP): {fp}")
+print(f"True Negatives (TN): {tn}")
+print(f"False Negatives (FN): {fn}")
+
+
 for thresh in thresholds:
     tp = len(predictions_pd[(predictions_pd['score'] > thresh) & (predictions_pd['label'] == 1)])
     fp = len(predictions_pd[(predictions_pd['score'] > thresh) & (predictions_pd['label'] == 0)])
