@@ -45,4 +45,10 @@ plt.xlabel('Proportion of data')
 plt.ylabel('Gain')
 plt.title('Gain Chart')
 plt.legend()
-plt.show()
+
+# Save the plot as a PNG file
+output_file_path = "gain_chart.png"
+plt.savefig(output_file_path)
+
+
+print(f"Gain chart saved as {output_file_path}")
