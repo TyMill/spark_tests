@@ -46,12 +46,47 @@ tn = predictions[(predictions.label == 0) & (predictions.prediction == 0)].count
 fp = predictions[(predictions.label == 0) & (predictions.prediction == 1)].count()
 fn = predictions[(predictions.label == 1) & (predictions.prediction == 0)].count()
 
-# Display the confusion matrix
-print("Confusion Matrix:")
-print(f"True Positives (TP): {tp}")
-print(f"False Positives (FP): {fp}")
-print(f"True Negatives (TN): {tn}")
-print(f"False Negatives (FN): {fn}")
+# Extract the counts from the Spark DataFrame
+tp = cmx.filter(cmx.Metric == "True Positives").select("Count").collect()[0][0]
+fp = cmx.filter(cmx.Metric == "False Positives").select("Count").collect()[0][0]
+tn = cmx.filter(cmx.Metric == "True Negatives").select("Count").collect()[0][0]
+fn = cmx.filter(cmx.Metric == "False Negatives").select("Count").collect()[0][0]
+
+
+„cmx = spark.createDataFrame([
+    ("True Positives", tp),
+    ("False Positives", fp),
+    ("True Negatives", tn),
+    ("False Negatives", fn)
+], ["Metric", "Count"])
+
+
+# Calculate the metrics
+accuracy = (tp + tn) / (tp + tn + fp + fn)
+precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
+f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
+npv = tn / (tn + fn) if (tn + fn) > 0 else 0
+fdr = fp / (tp + fp) if (tp + fp) > 0 else 0
+miss_rate = fn / (fn + tp) if (fn + tp) > 0 else 0
+mcc = ((tp * tn) - (fp * fn)) / np.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)) if np.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)) > 0 else 0
+
+metrics_df = spark.createDataFrame([
+    ("Accuracy", accuracy),
+    ("Precision", precision),
+    ("Recall", recall),
+    ("Specificity", specificity),
+    ("F1 Score", f1_score),
+    ("False Positive Rate", fpr),
+    ("Negative Predictive Value", npv),
+    ("False Discovery Rate", fdr),
+    ("Miss Rate", miss_rate),
+    ("Matthews Correlation Coefficient", mcc)
+], ["Metric", "Value"])
+
+metrics_df.show(truncate=False)
 
 
 for thresh in thresholds:
