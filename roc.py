@@ -57,4 +57,10 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
 plt.legend(loc='lower right')
-plt.show()
+
+# Save the plot as a PNG file
+output_file_path = "gain_chart.png"
+plt.savefig(output_file_path)
+
+
+print(f"Gain chart saved as {output_file_path}")
