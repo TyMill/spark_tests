@@ -3,7 +3,7 @@ from pyspark.mllib.evaluation import MulticlassMetrics
 from pyspark.sql.functions import col
 
 # Convert DataFrame to RDD
-predictionAndLabels = predictions.select(['prediction', 'label']).withColumn('label', col('label').cast('double')).rdd
+predictionAndLabels = predictions.select(['prediction', 'label']).rdd.map(lambda row: (float(row['prediction']), float(row['label'])))
 
 # Instantiate metrics object
 metrics = MulticlassMetrics(predictionAndLabels)
